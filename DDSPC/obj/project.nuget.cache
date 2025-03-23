@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "mwm/hsuFLXg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\adeni\\Doktorske\\DDSPC\\DDSPC\\DDSPC.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\adeni\\.nuget\\packages\\microsoft.msagl\\1.1.6\\microsoft.msagl.1.1.6.nupkg.sha512",
+    "C:\\Users\\adeni\\.nuget\\packages\\microsoft.msagl.drawing\\1.1.6\\microsoft.msagl.drawing.1.1.6.nupkg.sha512",
+    "C:\\Users\\adeni\\.nuget\\packages\\microsoft.msagl.graphviewergdi\\1.1.7\\microsoft.msagl.graphviewergdi.1.1.7.nupkg.sha512"
+  ],
+  "logs": []
+}
