@@ -4,6 +4,19 @@ namespace DDSPC.Loaders;
 
 public class InstanceLoader
 {
+    public static void SaveInstance(DDSPCInput input, string filePath)
+    {
+        using StreamWriter writer = new StreamWriter(filePath);
+        writer.WriteLine(input.NumNodes);
+        writer.WriteLine(input.Edges.Count);
+        foreach ((int, int) edge in input.Edges)
+            writer.WriteLine($"{edge.Item1} {edge.Item2}");
+
+        writer.WriteLine(input.Conflicts.Count);
+        foreach ((int, int) conflict in input.Conflicts)
+            writer.WriteLine($"{conflict.Item1} {conflict.Item2}");
+    }
+
     public static DDSPCInput LoadInstance(string filePath)
     {
         List<(int, int)> edges = new();

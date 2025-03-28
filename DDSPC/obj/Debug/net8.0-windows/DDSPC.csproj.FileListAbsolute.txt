@@ -21,3 +21,4 @@ C:\Users\adeni\Doktorske\DDSPC\DDSPC\obj\Debug\net8.0-windows\ref\DDSPC.dll
 C:\Users\adeni\Doktorske\DDSPC\DDSPC\bin\Debug\net8.0-windows\Microsoft.Msagl.dll
 C:\Users\adeni\Doktorske\DDSPC\DDSPC\bin\Debug\net8.0-windows\Microsoft.Msagl.Drawing.dll
 C:\Users\adeni\Doktorske\DDSPC\DDSPC\bin\Debug\net8.0-windows\Microsoft.Msagl.GraphViewerGdi.dll
+C:\Users\adeni\Doktorske\DDSPC\DDSPC\obj\Debug\net8.0-windows\DDSPC.sourcelink.json

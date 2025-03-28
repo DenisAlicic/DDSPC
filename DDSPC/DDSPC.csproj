@@ -6,21 +6,23 @@
         <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;x64</Platforms>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Reference Include="ILOG.Concert">
-            <HintPath>..\..\..\..\..\Program Files\IBM\ILOG\CPLEX_Studio_Community2212\cplex\bin\x64_win64\ILOG.Concert.dll</HintPath>
-        </Reference>
-        <Reference Include="ILOG.CPLEX">
-            <HintPath>..\..\..\..\..\Program Files\IBM\ILOG\CPLEX_Studio_Community2212\cplex\bin\x64_win64\ILOG.CPLEX.dll</HintPath>
-        </Reference>
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Msagl" Version="1.1.6"/>
         <PackageReference Include="Microsoft.Msagl.Drawing" Version="1.1.6"/>
         <PackageReference Include="Microsoft.Msagl.GraphViewerGDI" Version="1.1.7"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="ILOG.Concert">
+            <HintPath>..\..\..\..\..\Program Files\IBM\ILOG\CPLEX_Studio2212\cplex\bin\x64_win64\ILOG.Concert.dll</HintPath>
+        </Reference>
+        <Reference Include="ILOG.CPLEX">
+            <HintPath>..\..\..\..\..\Program Files\IBM\ILOG\CPLEX_Studio2212\cplex\bin\x64_win64\ILOG.CPLEX.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

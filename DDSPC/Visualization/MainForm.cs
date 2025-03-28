@@ -1,19 +1,25 @@
 using DDSPC.Data;
-using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.GraphViewerGdi;
 using Color = Microsoft.Msagl.Drawing.Color;
 using Edge = Microsoft.Msagl.Drawing.Edge;
+using FontStyle = System.Drawing.FontStyle;
 using Node = Microsoft.Msagl.Drawing.Node;
 
-public partial class MainForm : Form
+namespace DDSPC.Visualization;
+
+public class MainForm : Form
 {
     private GViewer viewer;
     private int numNodes;
+    private StatusStrip statusStrip;
+    private ToolStripStatusLabel statusLabel;
     private List<(int, int)> edges;
     private List<(int, int)> conflicts;
     private HashSet<int>? D1;
     private HashSet<int>? D2;
+    private int? solutionValue;
+    private string? solutionSource;
 
     public MainForm(DDSPCInput input, DDSPCOutput? output)
     {
@@ -22,6 +28,8 @@ public partial class MainForm : Form
         conflicts = input.Conflicts;
         D1 = output?.D1;
         D2 = output?.D2;
+        solutionValue = output?.Value;
+        solutionSource = output?.Solver;
         InitializeComponent();
         Load += MainForm_Load;
     }
@@ -34,7 +42,18 @@ public partial class MainForm : Form
         viewer = new GViewer();
         viewer.Dock = DockStyle.Fill;
 
+        statusStrip = new StatusStrip();
+        statusLabel = new ToolStripStatusLabel
+        {
+            Text = "Solution: Not calculated",
+            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+        };
+        statusStrip.Items.Add(statusLabel);
+        statusStrip.Dock = DockStyle.Bottom;
+
+        // Postavi kontrolu
         Controls.Add(viewer);
+        Controls.Add(statusStrip);
     }
 
     private void MainForm_Load(object sender, EventArgs e)
@@ -87,5 +106,11 @@ public partial class MainForm : Form
         }
 
         viewer.Graph = graph;
+
+        if (solutionValue.HasValue)
+        {
+            statusLabel.Text =
+                $"Solution: |D1| = {D1?.Count ?? 0}, |D2| = {D2?.Count ?? 0}, Total = {solutionValue}, Solver = {solutionSource}";
+        }
     }
 }

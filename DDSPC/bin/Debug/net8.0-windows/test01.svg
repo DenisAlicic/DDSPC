@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--SvgWriter version 0.0.0.0-->
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="196.3168" height="219.3032" id="svg2" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(2.9026479721069336,740.5468654632568)">
+    <!--Edges-->
+    <path fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" d="M 30.4465 -717.0482 L 163.913 -668.3884" />
+    <path fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="2" stroke-dasharray="5" d="M 26.4482 -712.0415 L 77.4665 -632.9075" />
+    <path fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" d="M 164.1824 -660.8363 L 92.0918 -628.565" />
+    <path fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="2" stroke-dasharray="5" d="M 169.7966 -655.5421 L 130.068 -550.7007" />
+    <path fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" d="M 17.4005 -574.8689 L 20.7515 -710.4406" />
+    <path fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" d="M 87.5827 -615.5515 L 121.8371 -550.2038" />
+    <path fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" d="M 116.6752 -543.4125 L 26.9819 -562.7032" />
+    <!--nodes-->
+    <ellipse fill="#008000" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" cx="21" cy="-720.4922" rx="10.0547" ry="10.0547" />
+    <text x="16.5508" y="-714.4557" font-family="Arial" font-size="16" fill="#000000">
+      <tspan x="16.5508" dy="0">0</tspan>
+    </text>
+    <ellipse fill="#0000ff" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" cx="173.3595" cy="-664.9444" rx="10.0547" ry="10.0547" />
+    <text x="168.9103" y="-658.9079" font-family="Arial" font-size="16" fill="#000000">
+      <tspan x="168.9103" dy="0">1</tspan>
+    </text>
+    <ellipse fill="#808080" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="2" cx="17.152" cy="-564.8173" rx="10.0547" ry="10.0547" />
+    <text x="12.7028" y="-558.7809" font-family="Arial" font-size="16" fill="#000000">
+      <tspan x="12.7028" dy="0">4</tspan>
+    </text>
+    <ellipse fill="#008000" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" cx="82.9147" cy="-624.4568" rx="10.0547" ry="10.0547" />
+    <text x="78.4654" y="-618.4204" font-family="Arial" font-size="16" fill="#000000">
+      <tspan x="78.4654" dy="0">2</tspan>
+    </text>
+    <ellipse fill="#0000ff" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" cx="126.5052" cy="-541.2984" rx="10.0547" ry="10.0547" />
+    <text x="122.0559" y="-535.2619" font-family="Arial" font-size="16" fill="#000000">
+      <tspan x="122.0559" dy="0">3</tspan>
+    </text>
+    <!--end of nodes-->
+  </g>
+</svg>

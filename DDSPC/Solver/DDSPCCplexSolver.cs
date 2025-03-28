@@ -1,15 +1,10 @@
-#nullable enable
 using DDSPC.Data;
-
-
-namespace DDSPC.Solver;
-
-using System;
-using System.Collections.Generic;
 using ILOG.Concert;
 using ILOG.CPLEX;
 
-class DDSPCSolver
+namespace DDSPC.Solver;
+
+public class DDSPCCplexSolver
 {
     public static DDSPCOutput? Solve(DDSPCInput inputData)
     {
@@ -81,6 +76,7 @@ class DDSPCSolver
         {
             Console.WriteLine($"Solution found: {cplex.ObjValue}");
             output.Value = (int)cplex.ObjValue;
+            output.Solver = "CPLEX";
             for (int i = 0; i < inputData.NumNodes; i++)
             {
                 if (cplex.GetValue(x[i]) > 0.5)
