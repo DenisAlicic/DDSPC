@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DDSPC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b769169ad33c32e191765599006b699efe46e7fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee2bcc2c354da3b7a4bb9a9bdd236b86d21afb6a")]
 [assembly: System.Reflection.AssemblyProductAttribute("DDSPC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DDSPC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

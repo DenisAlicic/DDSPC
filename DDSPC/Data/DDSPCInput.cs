@@ -1,10 +1,45 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using DDSPC.Util;
+
 namespace DDSPC.Data;
 
 public class DDSPCInput
 {
-    public int NumNodes;
-    public List<(int, int)> Edges;
-    public List<(int, int)> Conflicts;
+    public int NumNodes { get; set; }
+
+    [JsonConverter(typeof(TupleListJsonConverter))]
+    public List<(int, int)> Edges { get; set; }
+
+    [JsonConverter(typeof(TupleListJsonConverter))]
+    public List<(int, int)> Conflicts { get; set; }
+
+    public string InstanceName { get; set; }
+
+    public bool IsConnected()
+    {
+        if (NumNodes == 0) return false;
+
+        var visited = new HashSet<int>();
+        var queue = new Queue<int>();
+        queue.Enqueue(0);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            visited.Add(current);
+
+            foreach (var (u, v) in Edges)
+            {
+                if (u == current && !visited.Contains(v))
+                    queue.Enqueue(v);
+                else if (v == current && !visited.Contains(u))
+                    queue.Enqueue(u);
+            }
+        }
+
+        return visited.Count == NumNodes;
+    }
 
     public static DDSPCInput Example01()
     {

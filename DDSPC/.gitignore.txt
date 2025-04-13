@@ -1,0 +1,47 @@
+# Standardni .NET ignore
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+.nuget/
+packages/
+*.userprefs
+*.suo
+*.user
+*.lock.json
+
+# Rider/VS specifično
+.idea/
+.vs/
+*.sln.iml
+*.swp
+*.DotSettings
+
+# Rezultati eksperimenata
+Data/Experiments/*
+!Data/Experiments/.gitkeep  # Prazan fajl za održavanje strukture
+
+# LaTeX izlazi
+*.aux
+*.log
+*.out
+*.toc
+*.pdf
+
+# Runtime podaci
+*.runtimeconfig.json
+*.dll
+*.pdb
+*.exe
+*.so
+*.dylib
+
+# Profiling podaci
+*.diagsession
+*.vsp
+*.vspscc
+
+# Test rezultati
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx

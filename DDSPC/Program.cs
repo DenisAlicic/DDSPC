@@ -1,6 +1,7 @@
 #nullable enable
 using DDSPC.Data;
 using DDSPC.Generators;
+using DDSPC.Runners;
 using DDSPC.Solver;
 using DDSPC.Visualization;
 
@@ -8,34 +9,15 @@ namespace DDSPC;
 
 class Program
 {
-    [STAThread]
-    public static void Main()
+    static void Main(string[] args)
     {
-        DDSPCGraphGenerator generator = new DDSPCGraphGenerator(42);
-        DDSPCInput input = generator.GenerateConnectedGraph(15, 0.3, 0.05);
-
-        DDSPCOutput? cplexOutput = DDSPCCplexSolver.Solve(input);
-        DDSPCGRASP graspSolver = new DDSPCGRASP(seed: 42, alpha: 0.5f);
-        DDSPCOutput? graspOutput = graspSolver.Solve(input);
-
-        if (cplexOutput != null && graspOutput != null)
+        if (args.Length > 0 && args[0] == "multiseed")
         {
-            if (cplexOutput.Value == graspOutput.Value)
-            {
-                Console.WriteLine("Grasp solved same as cplex!");
-            }
-            else if (cplexOutput.Value < graspOutput.Value)
-            {
-                Console.WriteLine("Grasp didn't find optimal solution!");
-            }
-            else
-            {
-                Console.WriteLine("This should never happen! Grasp found better solution than cplex!");
-            }
+            new ExperimentManager().RunMultiSeedExperiment();
+            return;
         }
 
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new MainForm(input, graspOutput));
+        Console.WriteLine("Dostupne komande:");
+        Console.WriteLine("dotnet run -- multiseed - Pokreće eksperiment sa više seedova");
     }
 }

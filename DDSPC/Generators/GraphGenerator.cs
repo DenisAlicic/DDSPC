@@ -1,0 +1,93 @@
+using DDSPC.Data;
+
+namespace DDSPC.Generators;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+public class GraphGenerator
+{
+    private readonly Random _random;
+
+    public GraphGenerator(int? seed = null)
+    {
+        _random = seed.HasValue ? new Random(seed.Value) : new Random();
+    }
+
+    public DDSPCInput GenerateConnectedGraph(int nodeCount, double edgeDensity, double conflictProbability,
+        string? name = null)
+    {
+        DDSPCInput graph;
+        int attempt = 0;
+        const int maxAttempts = 100;
+
+        do
+        {
+            graph = GenerateGraph(nodeCount, edgeDensity, conflictProbability, name);
+            attempt++;
+
+            if (attempt >= maxAttempts)
+            {
+                throw new Exception(
+                    $"Nije moguće generisati povezan graf sa {nodeCount} čvorova i gustinom {edgeDensity} nakon {maxAttempts} pokušaja");
+            }
+        } while (!graph.IsConnected());
+
+        return graph;
+    }
+
+    public DDSPCInput GenerateGraph(int nodeCount, double edgeDensity, double conflictProbability, string? name = null)
+    {
+        var edges = GenerateEdges(nodeCount, edgeDensity);
+        var conflicts = GenerateConflicts(nodeCount, conflictProbability);
+
+        return new DDSPCInput
+        {
+            NumNodes = nodeCount,
+            Edges = edges,
+            Conflicts = conflicts,
+            InstanceName = name ?? GenerateGraphName(nodeCount, edgeDensity, conflictProbability)
+        };
+    }
+
+    private List<(int, int)> GenerateEdges(int nodeCount, double edgeDensity)
+    {
+        var edges = new List<(int, int)>();
+        for (int i = 0; i < nodeCount; i++)
+        {
+            for (int j = i + 1; j < nodeCount; j++)
+            {
+                if (_random.NextDouble() < edgeDensity)
+                {
+                    edges.Add((i, j));
+                }
+            }
+        }
+
+        return edges;
+    }
+
+    private List<(int, int)> GenerateConflicts(int nodeCount, double conflictProbability)
+    {
+        var conflicts = new List<(int, int)>();
+        for (int i = 0; i < nodeCount; i++)
+        {
+            for (int j = i + 1; j < nodeCount; j++)
+            {
+                if (_random.NextDouble() < conflictProbability)
+                {
+                    conflicts.Add((i, j));
+                }
+            }
+        }
+
+        return conflicts;
+    }
+
+    private string GenerateGraphName(int nodes, double density, double conflict)
+    {
+        return $"G{nodes}_D{density:0.00}_C{conflict:0.00}";
+    }
+}
