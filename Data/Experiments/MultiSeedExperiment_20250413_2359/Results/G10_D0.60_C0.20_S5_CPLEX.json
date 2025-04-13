@@ -1,0 +1,14 @@
+{
+  "NumNodes": 10,
+  "D1": [
+    1,
+    4
+  ],
+  "D2": [
+    2,
+    7
+  ],
+  "Value": 4,
+  "Solver": "CPLEX",
+  "GapPercent": 0
+}

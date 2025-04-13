@@ -17,7 +17,15 @@ class Program
             return;
         }
 
-        Console.WriteLine("Dostupne komande:");
-        Console.WriteLine("dotnet run -- multiseed - Pokreće eksperiment sa više seedova");
+        if (args.Length > 0 && args[0] == "process")
+        {
+            string experimentPath = args.Length > 1
+                ? args[1]
+                : Path.Combine("Data", "Experiments", "Latest_Experiment");
+
+            new BatchProcessor().ProcessExperiment(experimentPath);
+            Console.WriteLine($"Processing completed. Results in: {experimentPath}");
+            return;
+        }
     }
 }

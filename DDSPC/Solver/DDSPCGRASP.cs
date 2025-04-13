@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DDSPC.Data;
 using DDSPC.Util;
 
@@ -15,6 +16,22 @@ public class DDSPCGRASP
         _maxIterations = maxIterations;
         _maxLocalSearchIterations = maxLocalSearchIterations;
         _random = seed.HasValue ? new Random(seed.Value) : new Random();
+    }
+
+    public DDSPCOutput? SolveWithMetrics(DDSPCInput input)
+    {
+        var stopwatch = Stopwatch.StartNew();
+
+        var result = Solve(input);
+        if (result is null)
+        {
+            return null;
+        }
+
+        result.Runtime = stopwatch.Elapsed;
+        result.GraphName = input.InstanceName;
+        result.NumNodes = input.NumNodes;
+        return result;
     }
 
     public DDSPCOutput? Solve(DDSPCInput input)

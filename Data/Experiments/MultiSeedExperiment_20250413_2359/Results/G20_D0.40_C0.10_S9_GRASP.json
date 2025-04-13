@@ -1,0 +1,16 @@
+{
+  "NumNodes": 20,
+  "D1": [
+    17,
+    0,
+    13
+  ],
+  "D2": [
+    6,
+    2,
+    4
+  ],
+  "Value": 6,
+  "Solver": "GRASP",
+  "GapPercent": 0
+}

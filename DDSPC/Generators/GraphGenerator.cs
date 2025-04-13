@@ -40,7 +40,7 @@ public class GraphGenerator
 
     public DDSPCInput GenerateGraph(int nodeCount, double edgeDensity, double conflictProbability, string? name = null)
     {
-        var edges = GenerateEdges(nodeCount, edgeDensity);
+        var edges = GenerateConnectedEdges(nodeCount, edgeDensity);
         var conflicts = GenerateConflicts(nodeCount, conflictProbability);
 
         return new DDSPCInput
@@ -50,6 +50,32 @@ public class GraphGenerator
             Conflicts = conflicts,
             InstanceName = name ?? GenerateGraphName(nodeCount, edgeDensity, conflictProbability)
         };
+    }
+
+    private List<(int, int)> GenerateConnectedEdges(int nodeCount, double edgeDensity)
+    {
+        var edges = new List<(int, int)>();
+        for (int i = 1; i < nodeCount; i++)
+        {
+            edges.Add((_random.Next(i), i));
+        }
+
+        int targetEdgeCount = (int)(edgeDensity * nodeCount * (nodeCount - 1) / 2);
+        int currentEdgeCount = edges.Count;
+
+        while (currentEdgeCount < targetEdgeCount)
+        {
+            int u = _random.Next(nodeCount);
+            int v = _random.Next(nodeCount);
+
+            if (u != v && !edges.Contains((u, v)) && !edges.Contains((v, u)))
+            {
+                edges.Add((u, v));
+                currentEdgeCount++;
+            }
+        }
+
+        return edges;
     }
 
     private List<(int, int)> GenerateEdges(int nodeCount, double edgeDensity)

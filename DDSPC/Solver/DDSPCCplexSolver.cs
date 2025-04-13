@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DDSPC.Data;
 using ILOG.Concert;
 using ILOG.CPLEX;
@@ -6,7 +7,24 @@ namespace DDSPC.Solver;
 
 public class DDSPCCplexSolver
 {
-    public static DDSPCOutput? Solve(DDSPCInput inputData)
+    // Dodajte ove metode u vaše solvere (CPLEX/GRASP)
+    public DDSPCOutput? SolveWithMetrics(DDSPCInput input)
+    {
+        var stopwatch = Stopwatch.StartNew();
+
+        var result = Solve(input);
+        if (result is null)
+        {
+            return null;
+        }
+
+        result.Runtime = stopwatch.Elapsed;
+        result.GraphName = input.InstanceName;
+        result.NumNodes = input.NumNodes;
+        return result;
+    }
+
+    public DDSPCOutput? Solve(DDSPCInput inputData)
     {
         Cplex cplex = new Cplex();
         INumVar[] x = new INumVar[inputData.NumNodes];
