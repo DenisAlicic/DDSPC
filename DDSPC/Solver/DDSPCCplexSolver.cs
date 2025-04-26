@@ -5,10 +5,9 @@ using ILOG.CPLEX;
 
 namespace DDSPC.Solver;
 
-public class DDSPCCplexSolver
+public class DDSPCCplexSolver : DDSPCSolver
 {
-    // Dodajte ove metode u vaše solvere (CPLEX/GRASP)
-    public DDSPCOutput? SolveWithMetrics(DDSPCInput input)
+    public override DDSPCOutput? SolveWithMetrics(DDSPCInput input)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -27,6 +26,7 @@ public class DDSPCCplexSolver
     public DDSPCOutput? Solve(DDSPCInput inputData)
     {
         Cplex cplex = new Cplex();
+        cplex.SetParam(Cplex.Param.TimeLimit, 60 * 5);
         INumVar[] x = new INumVar[inputData.NumNodes];
         INumVar[] y = new INumVar[inputData.NumNodes];
 
@@ -90,9 +90,9 @@ public class DDSPCCplexSolver
             D2 = new HashSet<int>(),
         };
 
-        if (cplex.Solve())
+        cplex.Solve();
+        if (cplex.GetStatus() == Cplex.Status.Optimal || cplex.GetStatus() == Cplex.Status.Feasible)
         {
-            Console.WriteLine($"Solution found: {cplex.ObjValue}");
             output.Value = (int)cplex.ObjValue;
             output.Solver = "CPLEX";
             for (int i = 0; i < inputData.NumNodes; i++)
@@ -107,6 +107,8 @@ public class DDSPCCplexSolver
                     output.D2.Add(i);
                 }
             }
+
+            output.IsCplexOptimal = cplex.GetStatus() == Cplex.Status.Optimal;
         }
         else
         {

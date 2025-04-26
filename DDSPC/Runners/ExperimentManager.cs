@@ -9,9 +9,9 @@ public class ExperimentManager
     public void RunMultiSeedExperiment()
     {
         // Parametri eksperimenta
-        int[] nodeCounts = { 10, 20, 50, 100 };
+        int[] nodeCounts = { 20, 50, 100, 200 };
         double[] edgeDensities = { 0.2, 0.4, 0.6 };
-        double[] conflictProbabilities = { 0.1, 0.2, 0.3 };
+        double[] conflictProbabilities = { 0.05, 0.1, 0.2 };
         int seedsCount = 10;
 
         string experimentName = $"MultiSeedExperiment_{DateTime.Now:yyyyMMdd_HHmm}";

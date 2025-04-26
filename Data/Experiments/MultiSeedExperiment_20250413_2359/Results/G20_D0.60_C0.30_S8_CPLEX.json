@@ -11,5 +11,7 @@
   ],
   "Value": 5,
   "Solver": "CPLEX",
+  "IterationLog": null,
+  "Runtime": "00:00:00.0254521",
   "GapPercent": 0
 }

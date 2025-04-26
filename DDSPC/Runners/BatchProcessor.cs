@@ -1,4 +1,4 @@
-using System.Text;
+using System.Diagnostics;
 using System.Text.Json;
 using DDSPC.Data;
 using DDSPC.Solver;
@@ -8,12 +8,14 @@ public class BatchProcessor
 {
     private readonly DDSPCCplexSolver _cplexSolver;
     private readonly DDSPCGRASP _graspSolver;
+    private readonly DDSCPGreedySolver _greedySolver;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public BatchProcessor()
     {
         _cplexSolver = new DDSPCCplexSolver();
-        _graspSolver = new DDSPCGRASP(alpha: 0.3, maxIterations: 100);
+        _graspSolver = new DDSPCGRASP(alpha: 0.3, maxIterations: 200, maxLocalSearchIterations: 100, 42);
+        _greedySolver = new DDSCPGreedySolver(alpha: 0.3, 42);
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -22,47 +24,51 @@ public class BatchProcessor
         };
     }
 
-    public void ProcessExperiment(string experimentName)
+    public void ProcessExperiment(string experimentPath, string solver)
     {
-        string experimentPath = Path.Combine(
-            ProjectPathHelper.GetDataPath(),
-            "Experiments",
-            experimentName);
-
         string resultsDir = Path.Combine(experimentPath, "Results");
         Directory.CreateDirectory(resultsDir);
 
-        var allResults = new List<DDSPCOutput>();
 
-        foreach (var sizeDir in Directory.GetDirectories(experimentPath, "N*"))
+        foreach (string sizeDir in Directory.GetDirectories(experimentPath, "N*"))
         {
             int nodes = int.Parse(new string(Path.GetFileName(sizeDir).Skip(1).ToArray()));
 
-            foreach (var paramDir in Directory.GetDirectories(sizeDir))
+            foreach (string paramDir in Directory.GetDirectories(sizeDir))
             {
-                var dirName = Path.GetFileName(paramDir);
+                string dirName = Path.GetFileName(paramDir);
                 double density = int.Parse(dirName.Split('_')[0][1..]) / 100.0;
                 double conflict = int.Parse(dirName.Split('_')[1][1..]) / 100.0;
 
-                foreach (var graphFile in Directory.GetFiles(paramDir, "G*.json"))
+                foreach (string graphFile in Directory.GetFiles(paramDir, "G*.json"))
                 {
                     try
                     {
                         string graphPath = Path.Combine(paramDir, graphFile);
                         Console.WriteLine($"Processing: {graphPath}");
 
-                        var graph = LoadGraph(graphPath);
-                        var results = ProcessGraph(graph);
-
-                        if (results.CplexResult != null && results.GraspResult != null)
+                        DDSPCInput graph = LoadGraph(graphPath);
+                        DDSPCOutput? result = null;
+                        if (solver == "cplex")
                         {
-                            // 3. Sačuvaj pojedinačne rezultate
-                            SaveResults(resultsDir, graphFile, results);
-                            allResults.Add(results.CplexResult);
-                            allResults.Add(results.GraspResult);
+                            result = _cplexSolver.SolveWithMetrics(graph);
+                        }
+                        else if (solver == "grasp")
+                        {
+                            result = _graspSolver.SolveWithMetrics(graph);
+                        }
+                        else if (solver == "greedy")
+                        {
+                            result = _greedySolver.SolveWithMetrics(graph);
+                        }
+
+                        if (result != null)
+                        {
+                            SaveResult(resultsDir, graphFile, result);
                         }
                     }
-                    catch (Exception ex)
+                    catch
+                        (Exception ex)
                     {
                         Console.WriteLine($"Error processing {graphFile}: {ex.Message}");
                     }
@@ -70,21 +76,26 @@ public class BatchProcessor
             }
         }
 
-        GenerateSummaryTable(experimentPath, allResults);
         Console.WriteLine($"Processing complete. Results in: {experimentPath}");
     }
 
-    private (DDSPCOutput CplexResult, DDSPCOutput GraspResult) ProcessGraph(DDSPCInput graph)
+    public void RunPythonAnalysis(string experimentPath)
     {
-        var cplexResult = _cplexSolver.SolveWithMetrics(graph);
-        var graspResult = _graspSolver.SolveWithMetrics(graph);
-
-        if (cplexResult != null && graspResult != null)
+        string pythonScript =
+            Path.Combine(ProjectPathHelper.GetProjectRootPath(), "DDSPC", "Scripts", "analyze_grasp.py");
+        ProcessStartInfo startInfo = new ProcessStartInfo
         {
-            graspResult.GapPercent = CalculateGap(cplexResult.Value, graspResult.Value);
-        }
+            FileName = "python",
+            Arguments = $"\"{pythonScript}\" \"{experimentPath}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        };
 
-        return (cplexResult, graspResult);
+        using (Process? process = Process.Start(startInfo))
+        {
+            process.WaitForExit();
+            Console.WriteLine(process.StandardOutput.ReadToEnd());
+        }
     }
 
     private double CalculateGap(int optimalValue, int heuristicValue)
@@ -98,63 +109,12 @@ public class BatchProcessor
         return JsonSerializer.Deserialize<DDSPCInput>(json, _jsonOptions);
     }
 
-    private void SaveResults(string resultsDir, string graphFile, (DDSPCOutput Cplex, DDSPCOutput Grasp) results)
+    private void SaveResult(string resultsDir, string graphFile, DDSPCOutput result)
     {
         string baseName = Path.GetFileNameWithoutExtension(graphFile);
 
         File.WriteAllText(
-            Path.Combine(resultsDir, $"{baseName}_CPLEX.json"),
-            JsonSerializer.Serialize(results.Cplex, _jsonOptions));
-
-        File.WriteAllText(
-            Path.Combine(resultsDir, $"{baseName}_GRASP.json"),
-            JsonSerializer.Serialize(results.Grasp, _jsonOptions));
-    }
-
-    private void GenerateSummaryTable(string experimentPath, List<DDSPCOutput> results)
-    {
-        var summaryPath = Path.Combine(experimentPath, "summary_table.tex");
-        var latexBuilder = new StringBuilder();
-
-        // 1. Zaglavlje tabele
-        latexBuilder.AppendLine(@"\begin{tabular}{|l|c|c|c|c|c|c|}
-\hline
-\textbf{Graph} & \textbf{Nodes} & \textbf{CPLEX Obj.} & \textbf{GRASP Obj.} & \textbf{Gap (\%)} & \textbf{CPLEX Time (s)} & \textbf{GRASP Time (s)} \\
-\hline");
-
-        // 2. Grupiši rezultate po grafu (bez seed-a u nazivu)
-        var groupedResults = results
-            .GroupBy(r => r.GraphName?.Split('_')[0..3].Aggregate((a, b) => $"{a}_{b}"))
-            .OrderBy(g => g.Key);
-
-        foreach (var group in groupedResults)
-        {
-            var cplexResults = group.Where(r => r.Solver == "CPLEX").ToList();
-            var graspResults = group.Where(r => r.Solver == "GRASP").ToList();
-
-            if (cplexResults.Any() && graspResults.Any())
-            {
-                // 3. Izračunaj prosečne vrednosti za sve seedove
-                double avgCplexObj = cplexResults.Average(r => r.Value);
-                double avgGraspObj = graspResults.Average(r => r.Value);
-                double avgGap = graspResults.Average(r => r.GapPercent);
-                double avgCplexTime = cplexResults.Average(r => r.Runtime.TotalSeconds);
-                double avgGraspTime = graspResults.Average(r => r.Runtime.TotalSeconds);
-
-                // 4. Dodaj red u tabelu
-                latexBuilder.AppendLine($@"{group.Key} & 
-{cplexResults.First().NumNodes} & 
-{avgCplexObj:F1} & 
-{avgGraspObj:F1} & 
-{avgGap:F2} & 
-{avgCplexTime:F2} & 
-{avgGraspTime:F2} \\");
-            }
-        }
-
-        // 5. Zatvaranje tabele
-        latexBuilder.AppendLine(@"\hline
-\end{tabular}");
-        File.WriteAllText(summaryPath, latexBuilder.ToString());
+            Path.Combine(resultsDir, $"{baseName}_{result.Solver}.json"),
+            JsonSerializer.Serialize(result, _jsonOptions));
     }
 }

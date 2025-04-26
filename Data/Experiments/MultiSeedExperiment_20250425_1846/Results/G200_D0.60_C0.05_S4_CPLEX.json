@@ -1,0 +1,19 @@
+{
+  "NumNodes": 200,
+  "D1": [
+    62,
+    98,
+    136,
+    153
+  ],
+  "D2": [
+    23,
+    57,
+    59
+  ],
+  "Value": 7,
+  "Solver": "CPLEX",
+  "IsCplexOptimal": false,
+  "Runtime": "00:05:00.8213019",
+  "GapPercent": 0
+}
