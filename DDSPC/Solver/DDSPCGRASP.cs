@@ -42,6 +42,7 @@ public class DDSPCGRASP : DDSPCSolver
 
         for (int i = 0; i < _maxIterations; i++)
         {
+            _greedySolver.Alpha = i / (double)_maxIterations;
             // Construction phase
             DDSPCOutput? solution = _greedySolver.ConstructGreedyRandomizedSolution(input);
             if (solution is null)

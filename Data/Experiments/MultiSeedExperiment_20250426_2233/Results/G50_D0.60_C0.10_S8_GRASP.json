@@ -1,0 +1,18 @@
+{
+  "NumNodes": 50,
+  "D1": [
+    30,
+    27,
+    7
+  ],
+  "D2": [
+    4,
+    3,
+    41
+  ],
+  "Value": 6,
+  "Solver": "GRASP",
+  "IsCplexOptimal": false,
+  "Runtime": "00:00:01.1022972",
+  "GapPercent": 0
+}

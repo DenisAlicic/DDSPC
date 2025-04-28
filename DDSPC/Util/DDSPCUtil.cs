@@ -20,7 +20,7 @@ public static class DDSPCUtil
         {
             foreach (int d2Node in solution.D2)
             {
-                if (input.Conflicts.Contains((d1Node, d2Node)) || input.Conflicts.Contains((d2Node, d1Node)))
+                if (input.Conflicts.Contains((d1Node, d2Node)))
                 {
                     return false;
                 }

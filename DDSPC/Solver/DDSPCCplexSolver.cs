@@ -26,7 +26,7 @@ public class DDSPCCplexSolver : DDSPCSolver
     public DDSPCOutput? Solve(DDSPCInput inputData)
     {
         Cplex cplex = new Cplex();
-        cplex.SetParam(Cplex.Param.TimeLimit, 60 * 5);
+        cplex.SetParam(Cplex.Param.TimeLimit, 60 * 20);
         INumVar[] x = new INumVar[inputData.NumNodes];
         INumVar[] y = new INumVar[inputData.NumNodes];
 
@@ -81,7 +81,6 @@ public class DDSPCCplexSolver : DDSPCSolver
         foreach ((int m, int n) in inputData.Conflicts)
         {
             cplex.AddLe(cplex.Sum(x[m], y[n]), 1);
-            cplex.AddLe(cplex.Sum(y[m], x[n]), 1);
         }
 
         DDSPCOutput output = new DDSPCOutput
@@ -109,6 +108,11 @@ public class DDSPCCplexSolver : DDSPCSolver
             }
 
             output.IsCplexOptimal = cplex.GetStatus() == Cplex.Status.Optimal;
+
+            if (!output.IsCplexOptimal)
+            {
+                output.CplexRelativeGap = cplex.GetMIPRelativeGap();
+            }
         }
         else
         {

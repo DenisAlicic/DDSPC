@@ -1,0 +1,24 @@
+{
+  "NumNodes": 200,
+  "D1": [
+    128,
+    29,
+    22,
+    102,
+    41,
+    56
+  ],
+  "D2": [
+    134,
+    108,
+    27,
+    148,
+    38,
+    46
+  ],
+  "Value": 12,
+  "Solver": "GREEDY",
+  "IsCplexOptimal": false,
+  "Runtime": "00:00:00.1149192",
+  "GapPercent": 0
+}

@@ -32,7 +32,15 @@ class Program
                 "Experiments",
                 experimentName);
 
-            processor.ProcessExperiment(experimentPath, solver);
+            if (solver == "cplex")
+            {
+                processor.ProcessCplexExperiment(experimentPath, solver);
+            }
+            else
+            {
+                processor.ProcessExperimentParallel(experimentPath, solver);
+            }
+
             Console.WriteLine($"Processing completed. Results in: {experimentPath}");
             return;
         }

@@ -7,15 +7,11 @@ using DDSPC.Util;
 public class BatchProcessor
 {
     private readonly DDSPCCplexSolver _cplexSolver;
-    private readonly DDSPCGRASP _graspSolver;
-    private readonly DDSCPGreedySolver _greedySolver;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public BatchProcessor()
     {
         _cplexSolver = new DDSPCCplexSolver();
-        _graspSolver = new DDSPCGRASP(alpha: 0.3, maxIterations: 200, maxLocalSearchIterations: 100, 42);
-        _greedySolver = new DDSCPGreedySolver(alpha: 0.3, 42);
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -24,7 +20,70 @@ public class BatchProcessor
         };
     }
 
-    public void ProcessExperiment(string experimentPath, string solver)
+    public void ProcessExperimentParallel(string experimentPath, string solver)
+    {
+        string resultsDir = Path.Combine(experimentPath, "Results");
+        Directory.CreateDirectory(resultsDir);
+
+        // Prikupimo sve grafove koje treba obraditi
+        var allGraphFiles = new List<(string graphPath, string graphFile, string paramDir, string resultsDir)>();
+
+        foreach (string sizeDir in Directory.GetDirectories(experimentPath, "N*"))
+        {
+            foreach (string paramDir in Directory.GetDirectories(sizeDir))
+            {
+                foreach (string graphFile in Directory.GetFiles(paramDir, "G*.json"))
+                {
+                    allGraphFiles.Add((Path.Combine(paramDir, graphFile), graphFile, paramDir, resultsDir));
+                }
+            }
+        }
+
+        var options = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount // Možeš prilagoditi broj niti
+        };
+
+        Console.WriteLine(options.MaxDegreeOfParallelism);
+
+        Parallel.ForEach(allGraphFiles, options, item =>
+        {
+            try
+            {
+                var (graphPath, graphFile, _, resultsDir) = item;
+                Console.WriteLine($"Processing: {graphPath}");
+
+                DDSPCInput graph = LoadGraph(graphPath);
+                DDSPCOutput? result = null;
+
+                switch (solver.ToLower())
+                {
+                    case "grasp":
+                        var graspSolver =
+                            new DDSPCGRASP(alpha: 0.3, maxIterations: 1000, maxLocalSearchIterations: 200);
+                        result = graspSolver.SolveWithMetrics(graph);
+                        break;
+                    case "greedy":
+                        var greedySolver = new DDSCPGreedySolver(alpha: 0.3, 42);
+                        result = greedySolver.SolveWithMetrics(graph);
+                        break;
+                }
+
+                if (result != null)
+                {
+                    SaveResult(resultsDir, graphFile, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing {item.graphFile}: {ex.Message}");
+            }
+        });
+
+        Console.WriteLine($"Processing complete. Results in: {experimentPath}");
+    }
+
+    public void ProcessCplexExperiment(string experimentPath, string solver)
     {
         string resultsDir = Path.Combine(experimentPath, "Results");
         Directory.CreateDirectory(resultsDir);
@@ -32,46 +91,31 @@ public class BatchProcessor
 
         foreach (string sizeDir in Directory.GetDirectories(experimentPath, "N*"))
         {
-            int nodes = int.Parse(new string(Path.GetFileName(sizeDir).Skip(1).ToArray()));
-
             foreach (string paramDir in Directory.GetDirectories(sizeDir))
             {
-                string dirName = Path.GetFileName(paramDir);
-                double density = int.Parse(dirName.Split('_')[0][1..]) / 100.0;
-                double conflict = int.Parse(dirName.Split('_')[1][1..]) / 100.0;
+                string graphFile = Directory.GetFiles(paramDir, "G*.json").First();
 
-                foreach (string graphFile in Directory.GetFiles(paramDir, "G*.json"))
+                try
                 {
-                    try
-                    {
-                        string graphPath = Path.Combine(paramDir, graphFile);
-                        Console.WriteLine($"Processing: {graphPath}");
+                    string graphPath = Path.Combine(paramDir, graphFile);
+                    Console.WriteLine($"Processing: {graphPath}");
 
-                        DDSPCInput graph = LoadGraph(graphPath);
-                        DDSPCOutput? result = null;
-                        if (solver == "cplex")
-                        {
-                            result = _cplexSolver.SolveWithMetrics(graph);
-                        }
-                        else if (solver == "grasp")
-                        {
-                            result = _graspSolver.SolveWithMetrics(graph);
-                        }
-                        else if (solver == "greedy")
-                        {
-                            result = _greedySolver.SolveWithMetrics(graph);
-                        }
-
-                        if (result != null)
-                        {
-                            SaveResult(resultsDir, graphFile, result);
-                        }
-                    }
-                    catch
-                        (Exception ex)
+                    DDSPCInput graph = LoadGraph(graphPath);
+                    DDSPCOutput? result = null;
+                    if (solver == "cplex")
                     {
-                        Console.WriteLine($"Error processing {graphFile}: {ex.Message}");
+                        result = _cplexSolver.SolveWithMetrics(graph);
                     }
+
+                    if (result != null)
+                    {
+                        SaveResult(resultsDir, graphFile, result);
+                    }
+                }
+                catch
+                    (Exception ex)
+                {
+                    Console.WriteLine($"Error processing {graphFile}: {ex.Message}");
                 }
             }
         }

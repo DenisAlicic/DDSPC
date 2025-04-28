@@ -7,11 +7,11 @@ namespace DDSPC.Solver;
 public class DDSCPGreedySolver : DDSPCSolver
 {
     private readonly Random _random;
-    private readonly double _alpha; // Parameter for restricted candidate list (0 = greedy, 1 = random)
+    public double Alpha { get; set; }
 
     public DDSCPGreedySolver(double alpha, int? seed = null)
     {
-        _alpha = alpha;
+        Alpha = alpha;
         _random = seed.HasValue ? new Random(seed.Value) : new Random();
     }
 
@@ -78,7 +78,7 @@ public class DDSCPGreedySolver : DDSPCSolver
             // Create restricted candidate list (RCL)
             int minCoverage = coverage.Values.Min();
             int maxCoverage = coverage.Values.Max();
-            double threshold = minCoverage + _alpha * (maxCoverage - minCoverage);
+            double threshold = minCoverage + Alpha * (maxCoverage - minCoverage);
 
             List<int> rcl = candidates.Where(c => coverage[c] >= threshold).ToList();
 
@@ -112,7 +112,7 @@ public class DDSCPGreedySolver : DDSPCSolver
                 bool hasConflict = false;
                 foreach (int d1Node in solution.D1)
                 {
-                    if (input.Conflicts.Contains((d1Node, node)) || input.Conflicts.Contains((node, d1Node)))
+                    if (input.Conflicts.Contains((d1Node, node)))
                     {
                         hasConflict = true;
                         break;
@@ -143,7 +143,7 @@ public class DDSCPGreedySolver : DDSPCSolver
             // Create restricted candidate list (RCL)
             int minCoverage = coverage.Values.Min();
             int maxCoverage = coverage.Values.Max();
-            double threshold = minCoverage + _alpha * (maxCoverage - minCoverage);
+            double threshold = minCoverage + Alpha * (maxCoverage - minCoverage);
 
             List<int> rcl = candidates.Where(c => coverage[c] >= threshold).ToList();
 

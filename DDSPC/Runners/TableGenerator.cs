@@ -29,8 +29,6 @@ public class TableGenerator
             string json = File.ReadAllText(path);
             DDSPCOutput output = JsonSerializer.Deserialize<DDSPCOutput>(json, _jsonOptions);
             string graphName = Path.GetFileNameWithoutExtension(outputFile);
-            // int lastIndex = graphName.IndexOf('S') - 1;
-            // graphName = graphName.Substring(0, lastIndex);
             output.GraphName = graphName;
             allResults.Add(output);
         }
@@ -43,12 +41,11 @@ public class TableGenerator
         string summaryPath = Path.Combine(experimentPath, "summary_table.tex");
         StringBuilder latexBuilder = new StringBuilder();
 
-        // 1. Modifikovano zaglavlje tabele sa ugnježdenim kolonama
-        latexBuilder.AppendLine(@"\begin{tabular}{l c c c c c c c c }
+        latexBuilder.AppendLine(@"\begin{tabular}{l c c c c c c c c c c }
 \hline
-\textbf{Nodes} & \textbf{Density} & \textbf{Conflict prob.} & \multicolumn{3}{c }{\textbf{Objective}} & \multicolumn{3}{c }{\textbf{Time (s)}} \\
-\cline{4-6} \cline{7-9}
- & & & \textbf{CPLEX} & \textbf{GRASP} & \textbf{GREEDY} & \textbf{CPLEX} & \textbf{GRASP} & \textbf{GREEDY} \\
+\textbf{Nodes} & \textbf{Density} & \textbf{Conflict} & \textbf {Optimal} & \multicolumn{3}{c }{\textbf{Objective}} & \textbf{Best} & \multicolumn{3}{c }{\textbf{Time (s)}} \\
+\cline{5-7} \cline{9-11}
+ & & \textbf{prob.} & & \textbf{CPLEX} & \textbf{GRASP} & \textbf{GREEDY} & \textbf{GRASP} &\textbf{CPLEX} & \textbf{GRASP} & \textbf{GREEDY} \\
 \hline");
 
         // 2. Grupiši rezultate po grafu (bez seed-a u nazivu)
@@ -71,6 +68,8 @@ public class TableGenerator
                 double avgCplexTime = cplexResults.Average(r => r.Runtime.TotalSeconds);
                 double avgGraspTime = graspResults.Average(r => r.Runtime.TotalSeconds);
                 double avgGreedyTime = greedyResults.Average(r => r.Runtime.TotalSeconds);
+                string cplexOptimal = cplexResults.First().IsCplexOptimal ? "\\checkedbox" : "\\emptybox";
+                double bestGraspObj = graspResults.Min(r => r.Value);
 
                 string[] graphNameTokens = cplexResults.First().GraphName.Split('_');
                 float density = float.Parse(graphNameTokens[1].Substring(1, graphNameTokens[1].Length - 1));
@@ -78,7 +77,7 @@ public class TableGenerator
 
                 // 4. Dodaj red u tabelu
                 latexBuilder.AppendLine(
-                    $@"{cplexResults.First().NumNodes} & {density} & {conflictProbability} & {avgCplexObj:F1} & {avgGraspObj:F1} & {avgGreedyObj:F1} & {avgCplexTime:F2} & {avgGraspTime:F2} & {avgGreedyTime:F2} \\");
+                    $@"{cplexResults.First().NumNodes} & {density} & {conflictProbability} & {cplexOptimal} & {avgCplexObj:F1} & {avgGraspObj:F1} & {avgGreedyObj:F1} & {bestGraspObj:F1} & {avgCplexTime:F2} & {avgGraspTime:F2} & {avgGreedyTime:F2} \\");
             }
 
             if (!cplexResults.Any() && graspResults.Any() && greedyResults.Any())
@@ -95,7 +94,7 @@ public class TableGenerator
 
                 // 4. Dodaj red u tabelu
                 latexBuilder.AppendLine(
-                    $@"{graspResults.First().NumNodes} & {density} & {conflictProbability} & - & {avgGraspObj:F1} & {avgGreedyObj:F1} & - & {avgGraspTime:F2} & {avgGreedyTime:F2} \\");
+                    $@"{graspResults.First().NumNodes} & {density} & {conflictProbability} & - & - & {avgGraspObj:F1} & {avgGreedyObj:F1} & - & {avgGraspTime:F2} & {avgGreedyTime:F2} \\");
             }
 
             if (!cplexResults.Any() && graspResults.Any() && !greedyResults.Any())
@@ -110,7 +109,7 @@ public class TableGenerator
 
                 // 4. Dodaj red u tabelu
                 latexBuilder.AppendLine(
-                    $@"{graspResults.First().NumNodes} & {density} & {conflictProbability} & - & {avgGraspObj:F1} & - & - & {avgGraspTime:F2} & - \\");
+                    $@"{graspResults.First().NumNodes} & {density} & {conflictProbability} & - & - & {avgGraspObj:F1} & - & - & {avgGraspTime:F2} & - \\");
             }
         }
 

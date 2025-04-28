@@ -11,6 +11,7 @@ public class DDSPCOutput
     public int Value { get; set; }
     public string Solver { get; set; }
     public bool IsCplexOptimal { get; set; }
+    public double CplexRelativeGap { get; set; }
     public TimeSpan Runtime { get; set; }
 
     [JsonIgnore] public string GraphName { get; set; }

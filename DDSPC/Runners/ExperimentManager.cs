@@ -9,7 +9,7 @@ public class ExperimentManager
     public void RunMultiSeedExperiment()
     {
         // Parametri eksperimenta
-        int[] nodeCounts = { 20, 50, 100, 200 };
+        int[] nodeCounts = { 250, 300, 500 };
         double[] edgeDensities = { 0.2, 0.4, 0.6 };
         double[] conflictProbabilities = { 0.05, 0.1, 0.2 };
         int seedsCount = 10;
@@ -34,7 +34,7 @@ public class ExperimentManager
                 {
                     for (int seed = 1; seed <= seedsCount; seed++)
                     {
-                        var generator = new GraphGenerator(seed);
+                        var generator = new GraphGenerator(1);
                         var graph = generator.GenerateConnectedGraph(nodes, density, conflict);
 
                         string graphFolder = Path.Combine(sizeFolder,

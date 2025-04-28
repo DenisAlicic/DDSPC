@@ -1,0 +1,29 @@
+{
+  "NumNodes": 100,
+  "D1": [
+    68,
+    2,
+    61,
+    21,
+    13,
+    36,
+    15,
+    10
+  ],
+  "D2": [
+    17,
+    0,
+    31,
+    9,
+    19,
+    57,
+    91,
+    11
+  ],
+  "Value": 16,
+  "Solver": "GRASP",
+  "IsCplexOptimal": false,
+  "CplexRelativeGap": 0,
+  "Runtime": "00:00:27.7144438",
+  "GapPercent": 0
+}

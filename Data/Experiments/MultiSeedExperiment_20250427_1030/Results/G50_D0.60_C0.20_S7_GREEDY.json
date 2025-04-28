@@ -1,0 +1,21 @@
+{
+  "NumNodes": 50,
+  "D1": [
+    30,
+    7,
+    5,
+    26
+  ],
+  "D2": [
+    2,
+    10,
+    31,
+    13
+  ],
+  "Value": 8,
+  "Solver": "GREEDY",
+  "IsCplexOptimal": false,
+  "CplexRelativeGap": 0,
+  "Runtime": "00:00:00.0207937",
+  "GapPercent": 0
+}
